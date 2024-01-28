@@ -29,8 +29,12 @@ def main(args):
     ref_pose = args.ref_pose
 
     current_root_path = os.path.split(sys.argv[0])[0]
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    sadtalker_paths = init_path(args.checkpoint_dir, os.path.join(script_directory, 'src/config'), args.size, args.old_version, args.preprocess)
+    
+    # print("Current root path: ", current_root_path)
 
-    sadtalker_paths = init_path(args.checkpoint_dir, os.path.join(current_root_path, 'src/config'), args.size, args.old_version, args.preprocess)
+    # sadtalker_paths = init_path(args.checkpoint_dir, os.path.join(current_root_path, 'src/config'), args.size, args.old_version, args.preprocess)
 
     #init model
     preprocess_model = CropAndExtract(sadtalker_paths, device)
