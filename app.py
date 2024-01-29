@@ -90,6 +90,8 @@ async def run_inference(
     print(result_folder_name)
     audio_path = f"./results/{result_folder_name}/temp_{driven_audio.filename}"
     image_path = f"./results/{result_folder_name}/temp_{source_image.filename}"
+    os.makedirs("./results/{result_folder_name}".format(result_folder_name=result_folder_name), exist_ok=True)
+    
     with open(audio_path, "wb") as audio_file:
         shutil.copyfileobj(driven_audio.file, audio_file)
     with open(image_path, "wb") as image_file:
