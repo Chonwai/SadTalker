@@ -148,12 +148,14 @@ async def run_inference(
             result_folder_name=result_folder_name
         )
         mp4_files = [f for f in os.listdir(result_file_path)]
-
-        print(mp4_files)
+        
+        file_path = os.path.join(result_file_path, mp4_files[0])
+        
+        print(file_path)
 
         # return {"message": "Inference completed successfully"}
         return FileResponse(
-            path=result_file_path, filename=mp4_files[0], media_type="video/mp4"
+            path=file_path, filename=mp4_files[0], media_type="video/mp4"
         )
     except Exception as e:
         os.remove(audio_path)
