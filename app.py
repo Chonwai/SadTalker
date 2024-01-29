@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import uvicorn
 from inference import main
@@ -7,6 +8,7 @@ from typing import List, Optional
 import torch
 import shutil
 import os
+import uuid
 
 app = FastAPI()
 
@@ -58,7 +60,7 @@ async def run_inference(
     ref_eyeblink: Optional[str] = Form(None),
     ref_pose: Optional[str] = Form(None),
     checkpoint_dir: str = Form("./checkpoints"),
-    result_dir: str = Form("./results"),
+    # result_dir: str = Form("./results"),
     pose_style: int = Form(0),
     batch_size: int = Form(2),
     size: int = Form(256),
@@ -85,6 +87,8 @@ async def run_inference(
     z_near: float = Form(5.0),
     z_far: float = Form(15.0),
 ):
+    result_folder_name = str(uuid.uuid4())
+    print(result_folder_name)
     audio_path = f"temp_{driven_audio.filename}"
     image_path = f"temp_{source_image.filename}"
     with open(audio_path, "wb") as audio_file:
@@ -92,8 +96,6 @@ async def run_inference(
     with open(image_path, "wb") as image_file:
         shutil.copyfileobj(source_image.file, image_file)
 
-    # 解析請求數據並轉換為命令行參數
-    # print(request)
     try:
         args = Namespace(
             driven_audio=audio_path,
@@ -101,7 +103,7 @@ async def run_inference(
             ref_eyeblink=ref_eyeblink,
             ref_pose=ref_pose,
             checkpoint_dir=checkpoint_dir,
-            result_dir=result_dir,
+            result_dir="./results/" + str(result_folder_name),
             pose_style=pose_style,
             batch_size=batch_size,
             size=int(size),
@@ -141,7 +143,13 @@ async def run_inference(
         os.remove(audio_path)
         os.remove(image_path)
 
-        return {"message": "Inference completed successfully"}
+        result_file_path = "./results/{result_folder_name}/"
+        mp4_files = [f for f in os.listdir(result_file_path) if f.endswith(".mp4")]
+
+        # return {"message": "Inference completed successfully"}
+        return FileResponse(
+            path=result_file_path, filename=mp4_files[0], media_type="video/mp4"
+        )
     except Exception as e:
         os.remove(audio_path)
         os.remove(image_path)
