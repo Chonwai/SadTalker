@@ -54,7 +54,6 @@ async def root():
 
 @app.post("/inference")
 async def run_inference(
-    # request: InferenceRequest,
     driven_audio: UploadFile = File(...),
     source_image: UploadFile = File(...),
     ref_eyeblink: Optional[str] = Form(None),
@@ -89,8 +88,8 @@ async def run_inference(
 ):
     result_folder_name = str(uuid.uuid4())
     print(result_folder_name)
-    audio_path = f"temp_{driven_audio.filename}"
-    image_path = f"temp_{source_image.filename}"
+    audio_path = f"./results/{result_folder_name}/temp_{driven_audio.filename}"
+    image_path = f"./results/{result_folder_name}/temp_{source_image.filename}"
     with open(audio_path, "wb") as audio_file:
         shutil.copyfileobj(driven_audio.file, audio_file)
     with open(image_path, "wb") as image_file:
@@ -143,10 +142,12 @@ async def run_inference(
         os.remove(audio_path)
         os.remove(image_path)
 
-        result_file_path = "./results/{result_folder_name}/".format(
+        result_file_path = f"./results/{result_folder_name}".format(
             result_folder_name=result_folder_name
         )
-        mp4_files = [f for f in os.listdir(result_file_path) if f.endswith(".mp4")]
+        mp4_files = [f for f in os.listdir(result_file_path)]
+
+        print(mp4_files)
 
         # return {"message": "Inference completed successfully"}
         return FileResponse(
