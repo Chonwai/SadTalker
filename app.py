@@ -143,7 +143,9 @@ async def run_inference(
         os.remove(audio_path)
         os.remove(image_path)
 
-        result_file_path = "./results/{result_folder_name}/"
+        result_file_path = "./results/{result_folder_name}/".format(
+            result_folder_name=result_folder_name
+        )
         mp4_files = [f for f in os.listdir(result_file_path) if f.endswith(".mp4")]
 
         # return {"message": "Inference completed successfully"}
